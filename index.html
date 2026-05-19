@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bello AI – Ray-Ban Meta</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap');
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --border: #1e1e1e;
+    --accent: #00ff88;
+    --accent2: #ff3366;
+    --text: #f0f0f0;
+    --muted: #555;
+    --glow: 0 0 20px rgba(0,255,136,0.3);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .grid-bg {
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 420px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .header {
+    text-align: center;
+    width: 100%;
+  }
+
+  .logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .title {
+    font-size: 42px;
+    font-weight: 800;
+    letter-spacing: -2px;
+    line-height: 1;
+    background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .subtitle {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 8px;
+    letter-spacing: 2px;
+  }
+
+  .status-card {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--muted);
+    flex-shrink: 0;
+    transition: all 0.3s;
+  }
+
+  .status-dot.connected { background: var(--accent); box-shadow: var(--glow); animation: pulse 2s infinite; }
+  .status-dot.listening { background: var(--accent2); box-shadow: 0 0 20px rgba(255,51,102,0.4); animation: pulse 0.5s infinite; }
+  .status-dot.thinking { background: #ffaa00; box-shadow: 0 0 20px rgba(255,170,0,0.4); animation: pulse 1s infinite; }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.7; }
+  }
+
+  .status-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--text);
+    letter-spacing: 1px;
+  }
+
+  .status-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    margin-top: 2px;
+    letter-spacing: 1px;
+  }
+
+  .main-btn {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .main-btn::before {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,255,136,0.2);
+    animation: rotate 8s linear infinite;
+  }
+
+  .main-btn::after {
+    content: '';
+    position: absolute;
+    inset: -20px;
+    border-radius: 50%;
+    border: 1px dashed rgba(0,255,136,0.1);
+    animation: rotate 15s linear infinite reverse;
+  }
+
+  @keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .main-btn:hover {
+    background: rgba(0,255,136,0.05);
+    box-shadow: var(--glow), inset 0 0 30px rgba(0,255,136,0.05);
+    transform: scale(1.02);
+  }
+
+  .main-btn.listening {
+    border-color: var(--accent2);
+    background: rgba(255,51,102,0.05);
+    box-shadow: 0 0 30px rgba(255,51,102,0.3);
+    animation: breathe 1s ease-in-out infinite;
+  }
+
+  .main-btn.thinking {
+    border-color: #ffaa00;
+    background: rgba(255,170,0,0.05);
+    box-shadow: 0 0 30px rgba(255,170,0,0.3);
+  }
+
+  @keyframes breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+
+  .btn-icon {
+    font-size: 32px;
+    transition: all 0.3s;
+  }
+
+  .btn-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: all 0.3s;
+  }
+
+  .main-btn.listening .btn-label { color: var(--accent2); }
+  .main-btn.thinking .btn-label { color: #ffaa00; }
+
+  .wake-word-hint {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    text-align: center;
+    letter-spacing: 2px;
+  }
+
+  .wake-word-hint span {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  .response-card {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: all 0.3s;
+  }
+
+  .response-card.active {
+    border-color: rgba(0,255,136,0.3);
+    box-shadow: 0 0 20px rgba(0,255,136,0.05);
+  }
+
+  .response-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+
+  .response-text {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 40px;
+  }
+
+  .transcript-card {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .transcript-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+
+  .transcript-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    min-height: 20px;
+  }
+
+  .error-text {
+    color: var(--accent2);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    text-align: center;
+    padding: 8px;
+    background: rgba(255,51,102,0.05);
+    border: 1px solid rgba(255,51,102,0.2);
+    border-radius: 8px;
+    width: 100%;
+    display: none;
+  }
+
+  .glasses-btn {
+    width: 100%;
+    padding: 14px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+  }
+
+  .glasses-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(0,255,136,0.03);
+  }
+
+  .waveform {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    height: 30px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .waveform.active { opacity: 1; }
+
+  .wave-bar {
+    width: 3px;
+    border-radius: 2px;
+    background: var(--accent2);
+    animation: wave 0.8s ease-in-out infinite;
+  }
+
+  .wave-bar:nth-child(1) { animation-delay: 0s; }
+  .wave-bar:nth-child(2) { animation-delay: 0.1s; }
+  .wave-bar:nth-child(3) { animation-delay: 0.2s; }
+  .wave-bar:nth-child(4) { animation-delay: 0.3s; }
+  .wave-bar:nth-child(5) { animation-delay: 0.2s; }
+  .wave-bar:nth-child(6) { animation-delay: 0.1s; }
+  .wave-bar:nth-child(7) { animation-delay: 0s; }
+
+  @keyframes wave {
+    0%, 100% { height: 4px; }
+    50% { height: 24px; }
+  }
+
+  .bottom-info {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    text-align: center;
+    letter-spacing: 1px;
+    opacity: 0.5;
+  }
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+
+<div class="container">
+  <div class="header">
+    <div class="logo">Ray-Ban Meta × Claude</div>
+    <div class="title">BELLO</div>
+    <div class="subtitle">// KI ASSISTENT FÜR DEINE BRILLE</div>
+  </div>
+
+  <div class="status-card">
+    <div class="status-dot" id="statusDot"></div>
+    <div>
+      <div class="status-text" id="statusText">WARTE AUF VERBINDUNG</div>
+      <div class="status-sub" id="statusSub">Mikrofon Zugriff nötig</div>
+    </div>
+  </div>
+
+  <button class="main-btn" id="mainBtn" onclick="toggleListening()">
+    <div class="btn-icon" id="btnIcon">🎙️</div>
+    <div class="btn-label" id="btnLabel">TIPPEN</div>
+  </button>
+
+  <div class="waveform" id="waveform">
+    <div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+  </div>
+
+  <div class="wake-word-hint">
+    Sag <span>"HEY BELLO"</span> oder tippe den Button
+  </div>
+
+  <div class="transcript-card">
+    <div class="transcript-label">// Du sagtest</div>
+    <div class="transcript-text" id="transcriptText">—</div>
+  </div>
+
+  <div class="response-card" id="responseCard">
+    <div class="response-label">// Bello antwortet</div>
+    <div class="response-text" id="responseText">Bereit für deine Fragen...</div>
+  </div>
+
+  <div class="error-text" id="errorText"></div>
+
+  <div class="bottom-info">BELLO v1.0 × POWERED BY CLAUDE AI</div>
+</div>
+
+<script>
+  let recognition = null;
+  let isListening = false;
+  let isThinking = false;
+  let synth = window.speechSynthesis;
+  let wakeWordActive = false;
+  let continuousMode = false;
+
+  const statusDot = document.getElementById('statusDot');
+  const statusText = document.getElementById('statusText');
+  const statusSub = document.getElementById('statusSub');
+  const mainBtn = document.getElementById('mainBtn');
+  const btnIcon = document.getElementById('btnIcon');
+  const btnLabel = document.getElementById('btnLabel');
+  const transcriptText = document.getElementById('transcriptText');
+  const responseText = document.getElementById('responseText');
+  const responseCard = document.getElementById('responseCard');
+  const errorText = document.getElementById('errorText');
+  const waveform = document.getElementById('waveform');
+
+  function setStatus(state, text, sub) {
+    statusDot.className = 'status-dot ' + state;
+    statusText.textContent = text;
+    statusSub.textContent = sub;
+  }
+
+  function showError(msg) {
+    errorText.style.display = 'block';
+    errorText.textContent = msg;
+    setTimeout(() => errorText.style.display = 'none', 4000);
+  }
+
+  function initRecognition() {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      showError('Spracherkennung nicht unterstützt. Bitte Chrome/Safari nutzen.');
+      return false;
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    recognition.lang = 'de-DE';
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    recognition.onstart = () => {
+      isListening = true;
+      setStatus('listening', 'HÖRT ZU...', 'Sprich jetzt!');
+      mainBtn.className = 'main-btn listening';
+      btnIcon.textContent = '🔴';
+      btnLabel.textContent = 'TIPPE ZUM STOP';
+      waveform.className = 'waveform active';
+    };
+
+    recognition.onresult = (event) => {
+      let interim = '';
+      let final = '';
+
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) {
+          final += event.results[i][0].transcript;
+        } else {
+          interim += event.results[i][0].transcript;
+        }
+      }
+
+      const displayText = final || interim;
+      transcriptText.textContent = displayText;
+
+      // Wake word detection
+      const lower = displayText.toLowerCase();
+      if (lower.includes('hey bello') || lower.includes('hei bello')) {
+        const question = displayText.replace(/hey bello/gi, '').replace(/hei bello/gi, '').trim();
+        if (question.length > 2) {
+          askClaude(question);
+        }
+      }
+
+      if (final && final.length > 5 && !final.toLowerCase().includes('hey bello')) {
+        if (wakeWordActive) {
+          askClaude(final);
+          wakeWordActive = false;
+        }
+      }
+    };
+
+    recognition.onerror = (event) => {
+      if (event.error === 'not-allowed') {
+        showError('Mikrofon Zugriff verweigert! Bitte Erlaubnis geben.');
+      }
+    };
+
+    recognition.onend = () => {
+      if (continuousMode && !isThinking) {
+        recognition.start();
+      } else {
+        isListening = false;
+        setStatus('connected', 'BEREIT', 'Tippe oder sag "Hey Bello"');
+        mainBtn.className = 'main-btn';
+        btnIcon.textContent = '🎙️';
+        btnLabel.textContent = 'TIPPEN';
+        waveform.className = 'waveform';
+      }
+    };
+
+    return true;
+  }
+
+  function toggleListening() {
+    if (isThinking) return;
+
+    if (!recognition) {
+      if (!initRecognition()) return;
+    }
+
+    if (isListening && !continuousMode) {
+      continuousMode = false;
+      recognition.stop();
+    } else {
+      continuousMode = true;
+      try {
+        recognition.start();
+        setStatus('connected', 'VERBUNDEN', 'Tippe oder sag "Hey Bello"');
+      } catch(e) {
+        recognition.stop();
+        setTimeout(() => {
+          recognition.start();
+        }, 100);
+      }
+    }
+  }
+
+  async function askClaude(question) {
+    if (isThinking) return;
+    isThinking = true;
+
+    setStatus('thinking', 'DENKT NACH...', 'Claude verarbeitet...');
+    mainBtn.className = 'main-btn thinking';
+    btnIcon.textContent = '🧠';
+    btnLabel.textContent = 'DENKT...';
+    waveform.className = 'waveform';
+
+    transcriptText.textContent = question;
+    responseText.textContent = '...';
+    responseCard.className = 'response-card active';
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: question })
+      });
+
+      if (!res.ok) throw new Error('Server Fehler: ' + res.status);
+
+      const data = await res.json();
+      const answer = data.response || 'Keine Antwort erhalten.';
+
+      responseText.textContent = answer;
+
+      // Speak the answer
+      speakAnswer(answer);
+
+    } catch (err) {
+      showError('Fehler: ' + err.message);
+      responseText.textContent = 'Fehler beim Verbinden mit Claude.';
+    } finally {
+      isThinking = false;
+      setStatus('connected', 'BEREIT', 'Tippe oder sag "Hey Bello"');
+      mainBtn.className = 'main-btn';
+      btnIcon.textContent = '🎙️';
+      btnLabel.textContent = 'TIPPEN';
+    }
+  }
+
+  function speakAnswer(text) {
+    synth.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'de-DE';
+    utterance.rate = 1.1;
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+
+    // Pick best German voice
+    const voices = synth.getVoices();
+    const germanVoice = voices.find(v => v.lang.includes('de') && v.localService) ||
+                        voices.find(v => v.lang.includes('de'));
+    if (germanVoice) utterance.voice = germanVoice;
+
+    synth.speak(utterance);
+  }
+
+  // Init
+  window.onload = () => {
+    setStatus('', 'BEREIT', 'Tippe den Button um zu starten');
+    if (initRecognition()) {
+      setStatus('connected', 'BEREIT', 'Tippe oder sag "Hey Bello"');
+    }
+
+    // Load voices
+    synth.onvoiceschanged = () => synth.getVoices();
+  };
+</script>
+</body>
+</html>
